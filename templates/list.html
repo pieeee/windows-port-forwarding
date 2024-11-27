@@ -1,0 +1,34 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Rule Name</th>
+      <th>Listen Address</th>
+      <th>Listen Port</th>
+      <th>Connect Address</th>
+      <th>Connect Port</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{range .}}
+    <tr>
+      <td>{{.RuleName}}</td>
+      <td>{{.ListenAddress}}</td>
+      <td>{{.ListenPort}}</td>
+      <td>{{.ConnectAddress}}</td>
+      <td>{{.ConnectPort}}</td>
+      <td>
+        <form
+          hx-post="/remove"
+          hx-target="#proxy-list"
+          hx-swap="outerHTML"
+          style="display: inline"
+        >
+          <input type="hidden" name="rule_name" value="{{.RuleName}}" />
+          <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+        </form>
+      </td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
