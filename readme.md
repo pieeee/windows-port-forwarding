@@ -1,126 +1,146 @@
-### **Port Forwarding App**
+# **Windows Port Forwarding App**
 
-This Go application is designed to simplify and automate the management of **port forwarding** and **firewall rules** on a Windows system. It provides a lightweight, user-friendly interface for adding, removing, and listing port proxy rules along with the necessary firewall configurations, making it ideal for developers or system administrators managing local or network-bound applications.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
----
 
-### **Why This App Was Built**
-
-Managing port forwarding and firewall rules on Windows can be cumbersome, especially when:
-- Applications require specific port forwarding rules (e.g., Docker services, web servers).
-- Manual `netsh` commands for port proxy and firewall management are error-prone.
-- Existing solutions like Task Scheduler or startup scripts don't provide the flexibility of a centralized tool for dynamic port management.
-
-This app was created to:
-1. **Automate Port Proxy and Firewall Rules**: Streamline the process of forwarding ports and ensuring proper access permissions.
-2. **Reduce Repetition**: Avoid repeatedly entering commands for frequently used ports.
-3. **Enable Dynamic Rules**: Allow the creation of forwarding rules for any port dynamically, without hardcoding.
-4. **Provide a Persistent UI**: Offer a lightweight interface that tracks and manages rules, even after reboots.
-5. **Run Seamlessly**: Operate silently in the background, making it unobtrusive during usage.
+This Go application provides an intuitive way to manage **port forwarding** and **firewall rules** on Windows, making it easy to expose local application ports within your local network. It automates the otherwise cumbersome process of using `netsh` commands to enable port forwarding, ensuring a smoother experience for developers and system administrators.
 
 ---
 
-### **Features**
+## **Why This App Was Needed**
 
-- **Add Port Forwarding Rules**: Dynamically forward traffic from a specific `listen address` and `listen port` to a `connect address` and `connect port`.
-- **Firewall Management**: Automatically create corresponding firewall rules to allow traffic for forwarded ports.
-- **List Existing Rules**: Display all current port proxy and firewall rules in a simple UI.
-- **Remove Rules**: Clean up port proxy and firewall rules with a single action.
-- **Run Without Console**: Operates as a hidden application to avoid cluttering the user's workflow.
+When working with applications that expose ports (e.g., Docker containers, web servers, or custom services), it’s common to face challenges when trying to access these services from other devices on the same network. Windows does not natively support dynamic or persistent port forwarding rules through a GUI, requiring manual configuration of `netsh` commands and firewall rules every time.
+
+This app was built to solve the following issues:
+1. **Access Exposed Ports from Other Devices**: Enable seamless access to local services (e.g., `localhost:6300`) from other devices in the network (e.g., `192.168.0.230:6300`).
+2. **Avoid Manual Configurations**: Simplify repetitive `netsh` and firewall configuration steps.
+3. **Dynamic and Persistent Rules**: Allow dynamic creation and management of forwarding rules that persist across reboots.
+4. **Centralized Management**: Provide a user-friendly interface to manage port forwarding and firewall rules without relying on multiple tools or scripts.
+
+---
+
+## **Features**
+
+1. **Add Port Forwarding Rules**:
+   - Dynamically forward traffic from a specific IP (`listen address`) and port (`listen port`) to another IP (`connect address`) and port (`connect port`).
+   - Automatically create corresponding firewall rules to allow traffic for forwarded ports.
+
+2. **Remove Port Forwarding Rules**:
+   - Easily clean up forwarding rules and associated firewall rules from the app.
+
+3. **List Existing Rules**:
+   - View all active port forwarding and firewall rules in a centralized interface.
+
+4. **Simple UI**:
+   - A lightweight, browser-based interface built with Go and `htmx` for easy management.
+
+5. **Hidden Operation**:
+   - Can run as a background process or startup application without requiring a visible console window.
 
 ---
 
-### **How It Works**
+## **How It Works**
 
-1. **Port Proxy Rules**: Uses the `netsh interface portproxy` command to add, delete, and list port forwarding rules.
-2. **Firewall Rules**: Leverages `netsh advfirewall` to create or remove corresponding firewall rules for open ports.
-3. **Persistent Storage**: Tracks rule names and configurations using a lightweight local SQLite database.
-4. **Startup Option**: Can be configured to run automatically at system startup.
+1. **Port Proxy Rules**:
+   - Uses the `netsh interface portproxy` command to add, delete, and list port forwarding rules.
+2. **Firewall Rules**:
+   - Automatically creates or removes firewall rules using `netsh advfirewall` to ensure traffic is allowed for forwarded ports.
+3. **Database**:
+   - Tracks all rules in a local SQLite database to provide persistence and easy retrieval.
 
 ---
+
+## **Installation**
 
 ### **Prerequisites**
-
 - **Go 1.20 or higher** (for building the application).
 - **Windows 10/11** (or a compatible version with `netsh` available).
 - **Admin Privileges**: Required to create port proxy and firewall rules.
 
----
+### **Clone the Repository**
+```bash
+git clone https://github.com/pieeee/windows-port-forwarding.git
+cd windows-port-forwarding
+```
 
-### **Installation**
+### **Build the Application**
+```bash
+go build -o port-forwarding.exe
+```
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/your-username/port-forwarding-app.git
-   cd port-forwarding-app
-   ```
+### **Run the Application**
+```bash
+port-forwarding.exe
+```
 
-2. **Build the Executable**:
-   ```bash
-   go build -o port-forwarding.exe
-   ```
-
-3. **Run the Application**:
-   ```bash
-   port-forwarding.exe
-   ```
-
-4. **(Optional) Add to Startup**:
-   - Use the **Startup Folder** or create a scheduled task for automatic startup.
+By default, the app runs on `http://localhost:2233`. Open this URL in your browser to manage port forwarding rules.
 
 ---
 
-### **Usage**
+## **Usage**
 
-#### **Add a Rule**
-1. Open the application in your browser (e.g., `http://localhost:2233`).
-2. Enter:
+### **Add a Rule**
+1. Open the app at `http://localhost:2233`.
+2. Fill in the required fields:
    - **Rule Name**: A descriptive name for the rule.
-   - **Listen Address**: The IP address to listen for incoming traffic (default: local machine's router IP).
+   - **Listen Address**: The IP address to listen for incoming traffic (default: local machine's IP).
    - **Listen Port**: The port to forward traffic from.
    - **Connect Address**: The destination IP address (default: `127.0.0.1`).
    - **Connect Port**: The port to forward traffic to.
-3. Click **Add Rule**.
+3. Click **Add Rule** to create the rule.
 
-#### **List Rules**
-- View all current port proxy and firewall rules in the table on the main page.
+### **List Rules**
+- View all active port proxy and firewall rules in the table on the main page.
 
-#### **Remove a Rule**
+### **Remove a Rule**
 - Click the **Remove** button next to a rule to delete both the port proxy and firewall rule.
 
 ---
 
-### **Technical Details**
+## **Startup Option**
+
+To automatically start the app at system boot, add the executable to the **Startup Folder**:
+1. Press `Win + R` and type:
+   ```plaintext
+   shell:startup
+   ```
+2. Copy the `port-forwarding.exe` file to this folder.
+
+---
+
+## **Technical Details**
 
 - **Backend**: Go with `netsh` commands for port proxy and firewall management.
 - **Database**: SQLite for persistent rule storage.
 - **Frontend**: Minimal HTML UI with [htmx](https://htmx.org/) for dynamic updates.
-- **Logging**: Logs application events to a file for debugging.
+- **Port Forwarding**: Uses `netsh interface portproxy` for traffic redirection.
+- **Firewall Rules**: Configures Windows Firewall automatically for each port forwarding rule.
 
 ---
 
-### **Why This App Is Useful**
+## **Limitations**
 
-- **For Developers**: Simplifies managing Docker and other local development tools requiring specific port forwarding.
-- **For Network Admins**: Provides a centralized way to manage rules across various ports.
-- **For Power Users**: Avoids repetitive tasks like manually entering `netsh` commands.
-- **For Automation**: Can be run as a background service or at startup to ensure rules are always active.
+1. **Local Network Only**: This app is designed for managing ports within the local network (LAN).
+2. **Admin Rights Required**: Creating port proxy and firewall rules requires administrative privileges.
 
 ---
 
-### **Future Improvements**
+## **Future Improvements**
 
-- **TLS Support**: Secure the web UI with HTTPS.
-- **System Tray Integration**: Add a system tray icon for easier access and status updates.
-- **Cross-Platform Support**: Extend functionality to Linux and macOS.
-- **Advanced Firewall Rules**: Allow specifying IP ranges or protocols for advanced firewall configurations.
+1. **System Tray Integration**: Add a tray icon for quick access and notifications.
+2. **TLS Support**: Secure the web interface with HTTPS.
+3. **Cross-Platform Support**: Extend functionality to Linux and macOS.
+4. **Advanced Firewall Rules**: Add options for IP ranges and protocols.
+
+---
+
+## **Contributing**
+
+Contributions are welcome! Feel free to open issues or submit pull requests for improvements or new features.
 
 ---
 
-### **Credits**
+## **License**
 
-- Built with ❤️ using Go and `netsh`.
-- SQLite database for persistent storage.
-- `htmx` for dynamic frontend updates.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
